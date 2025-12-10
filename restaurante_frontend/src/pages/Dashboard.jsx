@@ -15,20 +15,25 @@ const Dashboard = () => {
 
   const cargarDatos = async () => {
     try {
+      // Pedidos activos (para contar)
       const resPedidos = await fetch("http://localhost:8080/api/pedidos");
       const pedidos = await resPedidos.json();
 
+      // Mesas
       const resMesas = await fetch("http://localhost:8080/api/mesas");
       const dataMesas = await resMesas.json();
       setMesas(dataMesas);
 
-      
-      const ventas = pedidos
-        .filter(p => p.estadoNombre !== 'Cancelado')
-        .reduce((total, p) => {
-           const subtotal = p.items ? p.items.reduce((s, i) => s + i.precio, 0) : 0;
-           return total + subtotal + (p.direccion ? 15 : 0); 
-        }, 0);
+      // CAMBIO IMPORTANTE: Obtener ventas del HISTORIAL (facturas cerradas)
+      const resHistorial = await fetch("http://localhost:8080/api/pedidos/historial");
+      const historial = await resHistorial.json();
+
+      // Calcular ventas LÍQUIDAS (con descuentos, sin impuestos)
+      const ventasLiquidas = historial.reduce((total, pedido) => {
+        // Usar el total final guardado en la factura (ya incluye descuentos)
+        const totalPedido = pedido.totalFinalFactura || 0;
+        return total + totalPedido;
+      }, 0);
 
       const activos = pedidos.filter(p => p.estadoNombre !== 'Servido' && p.estadoNombre !== 'Cancelado').length;
       const ocupadas = dataMesas.filter(m => m.estado === 'Ocupada').length;
@@ -37,7 +42,7 @@ const Dashboard = () => {
       setPedidosRecientes(recientes);
 
       setStats({
-        ventasHoy: ventas,
+        ventasHoy: ventasLiquidas, // AHORA ES LÍQUIDO
         pedidosActivos: activos,
         mesasOcupadas: ocupadas,
         reservasHoy: 0, 
@@ -60,13 +65,13 @@ const Dashboard = () => {
       <Sidebar />
       <div className="ml-64 flex-1 p-8 font-sans">
         
-        {}
+        {/* Header */}
         <header className="mb-8">
             <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
             <p className="text-gray-500 mt-1">Resumen general del restaurante</p>
         </header>
 
-        {}
+        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard 
             title="Mesas Ocupadas" 
@@ -89,12 +94,12 @@ const Dashboard = () => {
           <StatCard 
             title="Ventas Hoy" 
             value={`Bs ${stats.ventasHoy.toFixed(2)}`} 
-            icon="📈" 
+            icon="💰" 
              bgIcon="bg-green-50 text-green-600"
           />
         </div>
 
-        {}
+        {/* Action Buttons */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <ActionButton to="/reservations" icon="📅" label="Nueva Reserva" color="text-vino-900"/>
             <ActionButton to="/orders" icon="📝" label="Nuevo Pedido" color="text-vino-900"/>
@@ -102,10 +107,10 @@ const Dashboard = () => {
             <ActionButton to="/delivery" icon="🛵" label="Delivery" color="text-blue-700"/>
         </div>
 
-        {}
+        {/* Layout Principal */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-fit">
           
-          {}
+          {/* Plano del Salón */}
           <div className="lg:col-span-2 bg-white p-8 rounded-xl shadow-sm border border-gray-100">
             <div className="flex justify-between items-center mb-8">
                 <h3 className="font-bold text-gray-800 text-xl font-serif">Plano del Salón</h3>
@@ -117,7 +122,7 @@ const Dashboard = () => {
                 </div>
             </div>
             
-            {}
+            {/* Grid de Mesas */}
             <div className="grid grid-cols-5 gap-4">
                  {mesas.map((mesa) => (
                     <div 
@@ -139,7 +144,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {}
+          {/* Pedidos Recientes */}
           <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 flex flex-col h-full">
             <div className="flex justify-between items-center mb-6">
                 <h3 className="font-bold text-gray-800 text-xl font-serif">Pedidos Recientes</h3>
@@ -182,7 +187,7 @@ const Dashboard = () => {
 };
 
 
-const StatCard = ({ title, value, icon, bgIcon }) => (
+const StatCard = ({ title, value, icon, bgIcon, subtitle }) => (
   <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow">
     <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl ${bgIcon}`}>
       {icon}
@@ -190,6 +195,7 @@ const StatCard = ({ title, value, icon, bgIcon }) => (
     <div>
       <p className="text-gray-500 text-sm font-medium">{title}</p>
       <p className="text-2xl font-bold text-gray-800 font-serif mt-1">{value}</p>
+      {subtitle && <p className="text-[10px] text-gray-400 mt-0.5">{subtitle}</p>}
     </div>
   </div>
 );
