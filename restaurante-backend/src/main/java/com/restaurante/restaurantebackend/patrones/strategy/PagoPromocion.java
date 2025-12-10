@@ -3,6 +3,10 @@ package com.restaurante.restaurantebackend.patrones.strategy;
 public class PagoPromocion implements EstrategiaCobro {
     private double porcentajeDescuento;
 
+    public double getPorcentajeDescuento() {
+        return porcentajeDescuento;
+    }
+
     public PagoPromocion(double porcentajeDescuento) {
         this.porcentajeDescuento = porcentajeDescuento;
     }
@@ -16,4 +20,6 @@ public class PagoPromocion implements EstrategiaCobro {
     public String getDescripcion() {
         return "Descuento por Promoción (" + (porcentajeDescuento * 100) + "%)";
     }
+
+
 }

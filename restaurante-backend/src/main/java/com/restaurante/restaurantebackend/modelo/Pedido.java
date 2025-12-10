@@ -85,4 +85,34 @@ public abstract class Pedido {
 
     public String getFechaFactura() { return fechaFactura; }
     public void setFechaFactura(String fechaFactura) { this.fechaFactura = fechaFactura; }
+
+    // Detalles de facturación 
+    private Double subtotalFactura;
+    private Double impuestoFactura;
+    private String nombreImpuestoFactura;
+    private Double descuentoFactura;
+    private String nombreDescuentoFactura;
+    private Double totalFinalFactura;
+
+    // Getters y Setters
+    public Double getSubtotalFactura() { return subtotalFactura; }
+    public void setSubtotalFactura(Double subtotalFactura) { this.subtotalFactura = subtotalFactura; }
+
+    public Double getImpuestoFactura() { return impuestoFactura; }
+    public void setImpuestoFactura(Double impuestoFactura) { this.impuestoFactura = impuestoFactura; }
+
+    public String getNombreImpuestoFactura() { return nombreImpuestoFactura; }
+    public void setNombreImpuestoFactura(String nombreImpuestoFactura) { this.nombreImpuestoFactura = nombreImpuestoFactura; }
+
+    public Double getDescuentoFactura() { return descuentoFactura; }
+    public void setDescuentoFactura(Double descuentoFactura) { this.descuentoFactura = descuentoFactura; }
+
+    public String getNombreDescuentoFactura() { return nombreDescuentoFactura; }
+    public void setNombreDescuentoFactura(String nombreDescuentoFactura) { this.nombreDescuentoFactura = nombreDescuentoFactura; }
+
+    public Double getTotalFinalFactura() { return totalFinalFactura; }
+    public void setTotalFinalFactura(Double totalFinalFactura) { this.totalFinalFactura = totalFinalFactura; }
+
+
+
 }

@@ -37,8 +37,8 @@ public class PedidoController {
     }
 
     @GetMapping("/{id}/total")
-    public double obtenerTotal(@PathVariable int id) {
-        return facade.calcularTotalPedido(id);
+    public Map<String, Object> obtenerTotal(@PathVariable int id) {
+        return facade.calcularDetalleTotal(id);
     }
 
     @GetMapping("/cocina")

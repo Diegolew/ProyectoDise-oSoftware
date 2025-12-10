@@ -13,7 +13,7 @@ const Billing = () => {
   const [loading, setLoading] = useState(false);
 
   const [mostrarModalCobro, setMostrarModalCobro] = useState(false);
-  const [mostrarFactura, setMostrarFactura] = useState(null); // Guarda el objeto factura a ver
+  const [mostrarFactura, setMostrarFactura] = useState(null);
 
   const [datosFacturacion, setDatosFacturacion] = useState({ nit: "", razonSocial: "" });
 
@@ -81,7 +81,7 @@ const Billing = () => {
         <header className="mb-8"><h1 className="text-3xl font-bold text-gray-800 font-serif">Facturación</h1></header>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {}
+            {/* Seleccionar Pedido */}
             <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 h-fit">
                 <h2 className="text-xl font-bold text-gray-800 font-serif mb-6">1. Seleccionar Pedido</h2>
                 <div className="mb-6">
@@ -102,17 +102,49 @@ const Billing = () => {
                 )}
             </div>
 
-            {}
+            {/* Total a Pagar - MODIFICADO */}
             <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center min-h-[300px]">
                 <h2 className="text-xl font-bold text-gray-800 font-serif mb-6">2. Total a Pagar</h2>
-                {loading ? <div className="text-center text-gray-400">Calculando...</div> : totalCalculado !== null ? (
+                {loading ? (
+                    <div className="text-center text-gray-400">Calculando...</div>
+                ) : totalCalculado ? (
                     <div className="text-center animate-scale-in">
-                        <span className="text-6xl font-serif font-bold text-vino-900">Bs {totalCalculado.toFixed(2)}</span>
-                        <button onClick={() => setMostrarModalCobro(true)} className="w-full mt-8 bg-vino-900 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-vino-800 transition-all active:scale-[0.98]">
+                        <span className="text-6xl font-serif font-bold text-vino-900">
+                            Bs {totalCalculado.totalFinal ? totalCalculado.totalFinal.toFixed(2) : totalCalculado.toFixed(2)}
+                        </span>
+                        
+                        {/* Mostrar detalle si existe */}
+                        {totalCalculado.subtotal && (
+                            <div className="mt-4 text-sm text-gray-600 space-y-1 bg-gray-50 p-4 rounded-lg">
+                                <p className="flex justify-between">
+                                    <span>Subtotal:</span>
+                                    <span>Bs {totalCalculado.subtotal.toFixed(2)}</span>
+                                </p>
+                                <p className="flex justify-between">
+                                    <span>{totalCalculado.nombreImpuesto || "IVA (13%)"}:</span>
+                                    <span>Bs {totalCalculado.impuesto.toFixed(2)}</span>
+                                </p>
+                                {totalCalculado.hayPromocion && (
+                                    <p className="flex justify-between text-green-600 font-bold">
+                                        <span> {totalCalculado.nombreDescuento}:</span>
+                                        <span>-Bs {totalCalculado.descuento.toFixed(2)}</span>
+                                    </p>
+                                )}
+                                <div className="border-t pt-2 mt-2 flex justify-between font-bold text-lg">
+                                    <span>TOTAL:</span>
+                                    <span>Bs {totalCalculado.totalFinal.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        )}
+                        
+                        <button onClick={() => setMostrarModalCobro(true)} 
+                            className="w-full mt-8 bg-vino-900 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-vino-800 transition-all active:scale-[0.98]">
                             Cobrar y Emitir Factura
                         </button>
                     </div>
-                ) : <div className="text-center text-gray-300 py-10">Selecciona un pedido</div>}
+                ) : (
+                    <div className="text-center text-gray-300 py-10">Selecciona un pedido</div>
+                )}
             </div>
         </div>
 
@@ -135,7 +167,7 @@ const Billing = () => {
             </div>
         </div>
 
-        {}
+        {/* Modal de Cobro */}
         {mostrarModalCobro && (
             <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
                 <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 animate-scale-in">
@@ -160,7 +192,7 @@ const Billing = () => {
             </div>
         )}
 
-        {}
+        {/* Modal Factura */}
         {mostrarFactura && (
             <ModalFactura factura={mostrarFactura} infoRestaurante={infoRestaurante} onClose={() => setMostrarFactura(null)} />
         )}
@@ -170,16 +202,22 @@ const Billing = () => {
   );
 };
 
+// Modal de Factura
 const ModalFactura = ({ factura, infoRestaurante, onClose }) => {
-    const subtotal = factura.items.reduce((s, i) => s + (i.precio || i.precioBase), 0);
-    const baseImponible = subtotal / 1.13;
-    const iva = subtotal - baseImponible;
+    // Usar los datos guardados en la factura (ya no hacemos fetch)
+    const subtotal = factura.subtotalFactura || 0;
+    const impuesto = factura.impuestoFactura || 0;
+    const nombreImpuesto = factura.nombreImpuestoFactura || "IVA (13%)";
+    const descuento = factura.descuentoFactura || 0;
+    const nombreDescuento = factura.nombreDescuentoFactura || "Sin descuento";
+    const totalFinal = factura.totalFinalFactura || 0;
+    const hayPromocion = descuento > 0;
 
     return (
         <div className="fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4 backdrop-blur-md">
             <div className="bg-white w-full max-w-2xl shadow-2xl relative animate-scale-in overflow-hidden">
                 
-                {/* Header Azul (Estilo Declarando) */}
+                {/* Header */}
                 <div className="bg-white p-8 pb-4">
                     <div className="flex justify-between items-start">
                         <div>
@@ -245,16 +283,22 @@ const ModalFactura = ({ factura, infoRestaurante, onClose }) => {
                 <div className="px-8 pb-8 pt-4 flex flex-col items-end">
                     <div className="w-64 space-y-2 text-sm">
                         <div className="flex justify-between text-gray-500">
-                            <span>BASE IMPONIBLE:</span>
-                            <span>{baseImponible.toFixed(2)}</span>
+                            <span>SUBTOTAL:</span>
+                            <span>Bs {subtotal.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between text-gray-500">
-                            <span>IVA (13%):</span>
-                            <span>{iva.toFixed(2)}</span>
+                            <span>{nombreImpuesto}:</span>
+                            <span>Bs {impuesto.toFixed(2)}</span>
                         </div>
+                        {hayPromocion && (
+                            <div className="flex justify-between text-green-600 font-bold">
+                                <span> {nombreDescuento}:</span>
+                                <span>-Bs {descuento.toFixed(2)}</span>
+                            </div>
+                        )}
                         <div className="flex justify-between text-xl font-bold text-gray-800 border-t pt-2 mt-2">
                             <span>TOTAL:</span>
-                            <span>Bs {subtotal.toFixed(2)}</span>
+                            <span>Bs {totalFinal.toFixed(2)}</span>
                         </div>
                     </div>
                 </div>

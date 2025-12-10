@@ -13,9 +13,11 @@ import com.restaurante.restaurantebackend.patrones.strategy.*;
 import com.restaurante.restaurantebackend.patrones.composite.Producto;
 import com.restaurante.restaurantebackend.modelo.Configuracion;
 import java.util.Optional;
-
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
 
 public class RestauranteFacade {
 
@@ -237,10 +239,21 @@ public class RestauranteFacade {
             p.setNitFactura(nit);
             p.setRazonSocialFactura(razonSocial);
             p.setFechaFactura(java.time.LocalDate.now().toString());
-
+    
+            // NUEVO: Calcular y guardar el detalle del total
+            Map<String, Object> detalle = calcularDetalleTotal(idPedido);
+            if (detalle != null) {
+                p.setSubtotalFactura((Double) detalle.get("subtotal"));
+                p.setImpuestoFactura((Double) detalle.get("impuesto"));
+                p.setNombreImpuestoFactura((String) detalle.get("nombreImpuesto"));
+                p.setDescuentoFactura((Double) detalle.get("descuento"));
+                p.setNombreDescuentoFactura((String) detalle.get("nombreDescuento"));
+                p.setTotalFinalFactura((Double) detalle.get("totalFinal"));
+            }
+    
             db.getPedidosIngresados().remove(p);
             db.getHistorialVentas().add(p);
-
+    
             System.out.println("FACADE: Factura generada para: " + razonSocial);
         }
     }
@@ -257,4 +270,54 @@ public class RestauranteFacade {
         db.setConfigSistema(config);
         System.out.println("FACADE: Datos de factura actualizados: " + config.getNombreRestaurante());
     }
+
+    public Map<String, Object> calcularDetalleTotal(int idPedido) {
+        Pedido pedido = db.getPedidosIngresados().stream()
+            .filter(p -> p.getId() == idPedido)
+            .findFirst()
+            .orElse(null);
+        
+        if (pedido == null) return null;
+        
+        Map<String, Object> detalle = new HashMap<>();
+        ContextoFacturacion contexto = db.getContextoFacturacion();
+        
+        // Calcular subtotal (sin impuestos ni descuentos)
+        double subtotal = pedido.calcularTotal();
+        
+        // Calcular impuesto
+        double impuesto = contexto.getEstrategiaImpuesto().calcularImpuesto(subtotal);
+        String nombreImpuesto = contexto.getEstrategiaImpuesto().getNombre();
+        
+        // Calcular total con impuesto
+        double totalConImpuesto = subtotal + impuesto;
+        
+        // Calcular descuento (si hay promoción)
+        double descuento = 0;
+        String nombreDescuento = "Sin descuento";
+        
+        if (contexto.getEstrategiaCobro() instanceof PagoPromocion) {
+            PagoPromocion promo = (PagoPromocion) contexto.getEstrategiaCobro();
+            double porcentaje = promo.getPorcentajeDescuento();
+            descuento = totalConImpuesto * porcentaje;
+            nombreDescuento = "Descuento (" + (porcentaje * 100) + "%)";
+        }
+        
+        // Total final
+        double totalFinal = totalConImpuesto - descuento;
+        
+        // Construir respuesta
+        detalle.put("subtotal", subtotal);
+        detalle.put("impuesto", impuesto);
+        detalle.put("nombreImpuesto", nombreImpuesto);
+        detalle.put("descuento", descuento);
+        detalle.put("nombreDescuento", nombreDescuento);
+        detalle.put("totalFinal", totalFinal);
+        detalle.put("hayPromocion", descuento > 0);
+        
+        return detalle;
+    }
 }
+
+
+
