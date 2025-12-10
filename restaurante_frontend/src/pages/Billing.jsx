@@ -108,7 +108,6 @@ const Billing = () => {
                 {loading ? <div className="text-center text-gray-400">Calculando...</div> : totalCalculado !== null ? (
                     <div className="text-center animate-scale-in">
                         <span className="text-6xl font-serif font-bold text-vino-900">Bs {totalCalculado.toFixed(2)}</span>
-                        <p className="text-sm text-green-600 mt-2 bg-green-50 inline-block px-3 py-1 rounded-full">✓ Strategy Pattern Applied</p>
                         <button onClick={() => setMostrarModalCobro(true)} className="w-full mt-8 bg-vino-900 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-vino-800 transition-all active:scale-[0.98]">
                             Cobrar y Emitir Factura
                         </button>

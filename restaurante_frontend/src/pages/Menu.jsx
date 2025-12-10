@@ -88,7 +88,6 @@ const Menu = () => {
           </div>
           
           <div className="flex gap-4">
-            <input type="text" placeholder="Buscar en el menú..." className="bg-white border border-gray-200 rounded-lg pl-4 pr-4 py-2 text-sm w-64 shadow-sm outline-none focus:ring-2 focus:ring-vino-800" />
             <button 
               onClick={() => abrirModal()}
               className="bg-vino-900 text-white px-6 py-2 rounded-lg font-bold shadow-md hover:bg-vino-800 transition-transform active:scale-95 flex items-center gap-2"

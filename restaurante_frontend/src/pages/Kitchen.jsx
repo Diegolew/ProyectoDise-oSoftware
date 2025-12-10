@@ -46,21 +46,9 @@ const Kitchen = () => {
       <div className="flex-1 ml-64 p-8 overflow-hidden h-screen flex flex-col">
         
         {}
-        <header className="mb-8 flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-800 font-serif">Cocina</h1>
-              <p className="text-gray-500 mt-1">Vista de pedidos para preparación</p>
-            </div>
-            
-            <div className="flex items-center gap-4">
-                <div className="relative">
-                    <span className="absolute left-3 top-2.5 text-gray-400">🔍</span>
-                    <input type="text" placeholder="Buscar..." className="bg-white border border-gray-200 rounded-lg pl-10 pr-4 py-2 text-sm w-64 shadow-sm" />
-                </div>
-                <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm">
-                    <span className="text-sm font-bold text-gray-700">Administrador</span>
-                </div>
-            </div>
+        <header className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-800 font-serif">Cocina</h1>
+            <p className="text-gray-500 mt-1">Vista de pedidos para preparación</p>
         </header>
 
         {}

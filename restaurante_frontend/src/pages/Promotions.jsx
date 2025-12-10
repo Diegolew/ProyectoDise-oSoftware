@@ -49,7 +49,7 @@ const Promotions = () => {
         <header className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-800 font-serif">Promociones</h1>
-            <p className="text-gray-500 mt-1">Gestiona descuentos y ofertas (Pattern: Strategy)</p>
+            <p className="text-gray-500 mt-1">Gestiona descuentos y ofertas</p>
           </div>
         </header>
 
