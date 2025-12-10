@@ -82,7 +82,7 @@ const Reservations = () => {
       <Sidebar />
       <div className="ml-64 flex-1 p-8">
         
-        {}
+        {/* Header */}
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-gray-800 font-serif">Reservas</h1>
           <p className="text-gray-500 mt-1">Gestiona las reservas del restaurante</p>
@@ -90,7 +90,7 @@ const Reservations = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-[600px]">
           
-          {}
+          {/* Calendario */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-fit">
             <h3 className="font-bold text-gray-800 text-xl font-serif mb-6">Calendario</h3>
             
@@ -121,7 +121,7 @@ const Reservations = () => {
             </div>
           </div>
 
-          {}
+          {/* Lista de Reservas */}
           <div className="lg:col-span-2 bg-white p-8 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-full">
             <div className="flex justify-between items-center mb-6 border-b pb-4">
                 <div>
@@ -148,7 +148,7 @@ const Reservations = () => {
                     reservasDelDia.map(r => (
                         <div key={r.id} className="relative border border-gray-100 rounded-xl p-4 flex justify-between items-start hover:shadow-md transition-shadow bg-white group">
                             
-                            {}
+                            {/* Info Reserva */}
                             <div className="flex gap-4 items-start">
                                 <div className="w-12 h-12 bg-pink-50 rounded-full flex items-center justify-center text-vino-800 text-xl shadow-sm">
                                     👤
@@ -167,9 +167,9 @@ const Reservations = () => {
                                 </div>
                             </div>
 
-                            {}
+                            {/* Acciones */}
                             <div className="flex items-center gap-2">
-                                {}
+                                {/* Dropdown Estado */}
                                 <div className="relative">
                                     <button 
                                         onClick={() => setDropdownAbierto(dropdownAbierto === r.id ? null : r.id)}
@@ -178,7 +178,7 @@ const Reservations = () => {
                                         Confirmada <span className="text-xs">▼</span>
                                     </button>
                                     
-                                    {}
+                                    {/* Menu Dropdown */}
                                     {dropdownAbierto === r.id && (
                                         <div className="absolute right-0 mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-xl z-20 py-1 animate-fade-in">
                                             <div className="px-3 py-2 text-xs font-bold text-gray-400 uppercase">Estado</div>
@@ -191,7 +191,7 @@ const Reservations = () => {
                                     )}
                                 </div>
 
-                                {}
+                                {/* Botón Eliminar */}
                                 <button 
                                     onClick={() => eliminarReserva(r.id)}
                                     className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
@@ -207,7 +207,7 @@ const Reservations = () => {
           </div>
         </div>
 
-        {}
+        {/* Modal Nueva Reserva */}
         {modalAbierto && (
             <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center backdrop-blur-sm">
                 <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-8 relative animate-scale-in">
@@ -248,21 +248,19 @@ const Reservations = () => {
                                 value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-5">
-                            <div>
-                                <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Hora Inicio *</label>
-                                <select className="w-full border border-gray-300 rounded-lg p-3 bg-white outline-none focus:ring-2 focus:ring-vino-800"
-                                    value={formData.hora} onChange={e => setFormData({...formData, hora: e.target.value})}>
-                                    <option>12:00</option><option>13:00</option><option>14:00</option>
-                                    <option>19:00</option><option>20:00</option><option>21:00</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Hora Fin *</label>
-                                <select className="w-full border border-gray-300 rounded-lg p-3 bg-white outline-none bg-gray-50 text-gray-400" disabled>
-                                    <option>Automático</option>
-                                </select>
-                            </div>
+                        <div>
+                            <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Hora de Reserva *</label>
+                            <select className="w-full border border-gray-300 rounded-lg p-3 bg-white outline-none focus:ring-2 focus:ring-vino-800"
+                                value={formData.hora} onChange={e => setFormData({...formData, hora: e.target.value})}>
+                                <option>12:00</option>
+                                <option>13:00</option>
+                                <option>14:00</option>
+                                <option>19:00</option>
+                                <option>20:00</option>
+                                <option>21:00</option>
+                                <option>22:00</option>
+                            </select>
+                            <p className="text-xs text-gray-400 mt-1"> Duración automática: 1 hora</p>
                         </div>
 
                         <div>
