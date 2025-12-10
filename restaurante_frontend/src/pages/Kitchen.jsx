@@ -30,8 +30,27 @@ const Kitchen = () => {
     }
   };
 
+  const eliminarPedido = async (id) => {
+    if (!window.confirm("¿Seguro que quieres eliminar este pedido de la cola?")) return;
+
+    try {
+        const res = await fetch(`http://localhost:8080/api/pedidos/${id}/cancelar`, {
+            method: "POST"
+        });
+        if (res.ok) {
+            fetchPedidosCocina();
+        } else {
+            const errorData = await res.json();
+            alert("❌ " + (errorData.message || "No se pudo eliminar"));
+        }
+    } catch (error) {
+        console.error(error);
+        alert("Error al intentar eliminar");
+    }
+  };
+
   useEffect(() => {
-    fetchPedidosCocina(); // Carga inicial
+    fetchPedidosCocina();
     const interval = setInterval(fetchPedidosCocina, 2000);
     return () => clearInterval(interval);
   }, []);
@@ -45,16 +64,13 @@ const Kitchen = () => {
       <Sidebar />
       <div className="flex-1 ml-64 p-8 overflow-hidden h-screen flex flex-col">
         
-        {/* Header */}
         <header className="mb-8">
             <h1 className="text-3xl font-bold text-gray-800 font-serif">Cocina</h1>
             <p className="text-gray-500 mt-1">Vista de pedidos para preparación</p>
         </header>
 
-        {/* Tablero Kanban */}
         <div className="grid grid-cols-3 gap-6 flex-1 overflow-hidden">
           
-          {/* Columna 1: En Cola */}
           <ColumnKanban 
             title="En Cola" 
             icon="🕒"
@@ -66,14 +82,14 @@ const Kitchen = () => {
               <CardPedido 
                 key={p.id} 
                 pedido={p} 
-                onAction={() => avanzarEstado(p.id)} 
+                onAction={() => avanzarEstado(p.id)}
+                onDelete={() => eliminarPedido(p.id)} 
                 btnText="Cocinar ▶" 
                 btnColor="bg-blue-600 hover:bg-blue-700 text-white" 
               />
             ))}
           </ColumnKanban>
 
-          {/* Columna 2: Preparando */}
           <ColumnKanban 
             title="Preparando" 
             icon="👨‍🍳"
@@ -92,7 +108,6 @@ const Kitchen = () => {
             ))}
           </ColumnKanban>
 
-          {/* Columna 3: Listo */}
           <ColumnKanban 
             title="Listo para Servir" 
             icon="✅"
@@ -137,37 +152,22 @@ const ColumnKanban = ({ title, icon, count, headerColor, bgBadge, children }) =>
   </div>
 );
 
-const CardPedido = ({ pedido, onAction, btnText, btnColor }) => {
+const CardPedido = ({ pedido, onAction, onDelete, btnText, btnColor }) => {
   
   const identificarTipo = (p) => {
     if (p.tipo === 'EN_MESA' || p.idMesa) {
-        return { 
-            icon: '🍽️', 
-            titulo: 'En Sala', 
-            subtitulo: `Mesa ${p.idMesa}`,
-            estilo: 'text-blue-600 bg-blue-50'
-        };
+        return { icon: '🍽️', titulo: 'En Sala', subtitulo: `Mesa ${p.idMesa}`, estilo: 'text-blue-600 bg-blue-50' };
     }
     if (p.tipo === 'PARA_LLEVAR') {
-        return { 
-            icon: '🛍️', 
-            titulo: 'Para Llevar', 
-            subtitulo: 'Pick-up',
-            estilo: 'text-orange-600 bg-orange-50'
-        };
+        return { icon: '🛍️', titulo: 'Para Llevar', subtitulo: 'Pick-up', estilo: 'text-orange-600 bg-orange-50' };
     }
-    return { 
-        icon: '🛵', 
-        titulo: 'Delivery', 
-        subtitulo: 'Moto',
-        estilo: 'text-green-600 bg-green-50'
-    };
+    return { icon: '🛵', titulo: 'Delivery', subtitulo: 'Moto', estilo: 'text-green-600 bg-green-50' };
   };
 
   const info = identificarTipo(pedido);
 
   return (
-    <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all animate-fade-in group">
+    <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all animate-fade-in group relative">
       <div className="flex justify-between items-start mb-3">
         <div>
           <div className="flex items-center gap-2 mb-2">
@@ -176,7 +176,6 @@ const CardPedido = ({ pedido, onAction, btnText, btnColor }) => {
               </span>
           </div>
           
-          {/* ETIQUETA DE TIPO DE PEDIDO */}
           <div className={`inline-flex items-center gap-2 px-2 py-1 rounded-md text-xs font-bold ${info.estilo}`}>
              <span>{info.icon}</span>
              <span>{info.titulo}</span>
@@ -189,17 +188,28 @@ const CardPedido = ({ pedido, onAction, btnText, btnColor }) => {
           </p>
         </div>
         
-        {onAction && (
-          <button 
-              onClick={onAction}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-transform active:scale-95 ${btnColor}`}
-          >
-              {btnText}
-          </button>
-        )}
+        <div className="flex flex-col items-end gap-2">
+            {onAction && (
+            <button 
+                onClick={onAction}
+                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-transform active:scale-95 ${btnColor}`}
+            >
+                {btnText}
+            </button>
+            )}
+
+            {onDelete && (
+                <button 
+                    onClick={onDelete}
+                    title="Cancelar Pedido"
+                    className="w-7 h-7 flex items-center justify-center border border-red-300 text-red-500 rounded-md hover:bg-red-50 hover:border-red-500 transition-colors"
+                >
+                    🗑️
+                </button>
+            )}
+        </div>
       </div>
       
-      {/* Lista de Items */}
       <div className="space-y-2 border-t border-gray-50 pt-3">
         {pedido.items.map((item, idx) => (
           <div key={idx} className="text-sm text-gray-600 flex items-start gap-2">
