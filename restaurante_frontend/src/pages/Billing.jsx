@@ -59,11 +59,16 @@ const Billing = () => {
     if (!datosFacturacion.nit || !datosFacturacion.razonSocial) return alert("Llena los datos");
 
     try {
-        await fetch(`http://localhost:8080/api/pedidos/${pedidoSeleccionado}/pagar`, {
+        const res = await fetch(`http://localhost:8080/api/pedidos/${pedidoSeleccionado}/pagar`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(datosFacturacion)
         });
+        
+        if (!res.ok) {
+            const errorData = await res.json(); 
+            throw new Error(errorData.message || " No puedes pagar sin que este servido ");
+        }
         
         alert("✅ Factura generada correctamente");
         setMostrarModalCobro(false);
@@ -71,7 +76,9 @@ const Billing = () => {
         setDatosPedido(null);
         setTotalCalculado(null);
         cargarDatos();
-    } catch (error) { alert("Error al pagar"); }
+    } catch (error) { 
+        alert("❌ " + error.message);  
+    }
   };
 
   return (

@@ -10,6 +10,7 @@ import java.util.List;
 public abstract class Pedido {
     protected int id;
     protected String nombreCliente;
+    protected String tipo;
     protected List<ItemMenu> items;
     protected EstadoPedido estado;
     private String nitFactura;
@@ -25,12 +26,27 @@ public abstract class Pedido {
         this.estado = new EnCola();
     }
 
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
+
     public void agregarObservador(PedidoObserver observer) {
         observadores.add(observer);
     }
 
     public void eliminarObservador(PedidoObserver observer) {
         observadores.remove(observer);
+    }
+
+    public void validarFacturacion() {
+        if (!estado.puedeFacturar()) {
+            throw new RuntimeException("Error: No se puede facturar un pedido en estado " + estado.getNombre() + ". El pedido debe estar SERVIDO.");
+        }
     }
 
     private void notificarObservadores() {

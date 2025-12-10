@@ -45,16 +45,16 @@ const Kitchen = () => {
       <Sidebar />
       <div className="flex-1 ml-64 p-8 overflow-hidden h-screen flex flex-col">
         
-        {}
+        {/* Header */}
         <header className="mb-8">
             <h1 className="text-3xl font-bold text-gray-800 font-serif">Cocina</h1>
             <p className="text-gray-500 mt-1">Vista de pedidos para preparación</p>
         </header>
 
-        {}
+        {/* Tablero Kanban */}
         <div className="grid grid-cols-3 gap-6 flex-1 overflow-hidden">
           
-          {}
+          {/* Columna 1: En Cola */}
           <ColumnKanban 
             title="En Cola" 
             icon="🕒"
@@ -73,7 +73,7 @@ const Kitchen = () => {
             ))}
           </ColumnKanban>
 
-          {}
+          {/* Columna 2: Preparando */}
           <ColumnKanban 
             title="Preparando" 
             icon="👨‍🍳"
@@ -92,7 +92,7 @@ const Kitchen = () => {
             ))}
           </ColumnKanban>
 
-          {}
+          {/* Columna 3: Listo */}
           <ColumnKanban 
             title="Listo para Servir" 
             icon="✅"
@@ -137,47 +137,83 @@ const ColumnKanban = ({ title, icon, count, headerColor, bgBadge, children }) =>
   </div>
 );
 
-const CardPedido = ({ pedido, onAction, btnText, btnColor }) => (
-  <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all animate-fade-in group">
-    <div className="flex justify-between items-start mb-3">
-      <div>
-        <div className="flex items-center gap-2">
-            <span className="font-serif font-bold text-lg text-gray-800">
-                {}
-                {pedido.items.length}x Items
-            </span>
+const CardPedido = ({ pedido, onAction, btnText, btnColor }) => {
+  
+  const identificarTipo = (p) => {
+    if (p.tipo === 'EN_MESA' || p.idMesa) {
+        return { 
+            icon: '🍽️', 
+            titulo: 'En Sala', 
+            subtitulo: `Mesa ${p.idMesa}`,
+            estilo: 'text-blue-600 bg-blue-50'
+        };
+    }
+    if (p.tipo === 'PARA_LLEVAR') {
+        return { 
+            icon: '🛍️', 
+            titulo: 'Para Llevar', 
+            subtitulo: 'Pick-up',
+            estilo: 'text-orange-600 bg-orange-50'
+        };
+    }
+    return { 
+        icon: '🛵', 
+        titulo: 'Delivery', 
+        subtitulo: 'Moto',
+        estilo: 'text-green-600 bg-green-50'
+    };
+  };
+
+  const info = identificarTipo(pedido);
+
+  return (
+    <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all animate-fade-in group">
+      <div className="flex justify-between items-start mb-3">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+              <span className="font-serif font-bold text-lg text-gray-800">
+                  {pedido.items.length}x Items
+              </span>
+          </div>
+          
+          {/* ETIQUETA DE TIPO DE PEDIDO */}
+          <div className={`inline-flex items-center gap-2 px-2 py-1 rounded-md text-xs font-bold ${info.estilo}`}>
+             <span>{info.icon}</span>
+             <span>{info.titulo}</span>
+             <span className="opacity-50">|</span>
+             <span>{info.subtitulo}</span>
+          </div>
+
+          <p className="text-[10px] text-gray-400 mt-2 font-mono">
+             ID: #{pedido.id}
+          </p>
         </div>
-        <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
-            <span>{pedido.tipo === 'EN_MESA' ? `Mesa ${pedido.idMesa}` : '🛵 Delivery'}</span>
-            <span className="text-gray-300">•</span>
-            <span>#{pedido.id}</span>
-        </p>
+        
+        {onAction && (
+          <button 
+              onClick={onAction}
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-transform active:scale-95 ${btnColor}`}
+          >
+              {btnText}
+          </button>
+        )}
       </div>
       
-      {onAction && (
-        <button 
-            onClick={onAction}
-            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-transform active:scale-95 ${btnColor}`}
-        >
-            {btnText}
-        </button>
-      )}
+      {/* Lista de Items */}
+      <div className="space-y-2 border-t border-gray-50 pt-3">
+        {pedido.items.map((item, idx) => (
+          <div key={idx} className="text-sm text-gray-600 flex items-start gap-2">
+            <span className="text-vino-800 font-bold">•</span>
+            <span>{item.nombre}</span>
+          </div>
+        ))}
+      </div>
+      
+      <div className="mt-3 text-[10px] text-gray-400 text-right">
+          hace unos momentos
+      </div>
     </div>
-    
-    {}
-    <div className="space-y-2 border-t border-gray-50 pt-3">
-      {pedido.items.map((item, idx) => (
-        <div key={idx} className="text-sm text-gray-600 flex items-start gap-2">
-          <span className="text-vino-800 font-bold">•</span>
-          <span>{item.nombre}</span>
-        </div>
-      ))}
-    </div>
-    
-    <div className="mt-3 text-[10px] text-gray-400 text-right">
-        hace unos momentos
-    </div>
-  </div>
-);
+  );
+};
 
 export default Kitchen;

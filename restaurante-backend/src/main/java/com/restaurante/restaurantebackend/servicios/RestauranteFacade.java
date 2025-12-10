@@ -33,23 +33,21 @@ public class RestauranteFacade {
 
     public Pedido crearPedido(String tipo, int id, String cliente, String datoExtra) {
 
-        PedidoFactory fabrica; // Usamos la interfaz
+        PedidoFactory fabrica; 
 
-        // 1. Decidimos qué fábrica usar según el String que llega del Frontend
         if ("EN_MESA".equals(tipo)) {
             int idMesa = Integer.parseInt(datoExtra);
             fabrica = new FabricaMesa(id, cliente, idMesa);
         } else if ("DELIVERY".equals(tipo) || "PARA_LLEVAR".equals(tipo)) {
-            // Nota: "Para Llevar" también usa la lógica de Delivery en nuestro modelo actual
             fabrica = new FabricaDelivery(id, cliente, datoExtra);
         } else {
             throw new IllegalArgumentException("Tipo de pedido no válido: " + tipo);
         }
 
-        // 2. Delegamos la creación al patrón Factory Method
         Pedido nuevoPedido = fabrica.crearPedido();
 
-        // 3. Configuración habitual (Observer, Singleton...)
+        nuevoPedido.setTipo(tipo); 
+        
         nuevoPedido.agregarObservador(new CocinaObserver());
         db.agregarPedido(nuevoPedido);
 
@@ -57,7 +55,7 @@ public class RestauranteFacade {
             ocuparMesa(Integer.parseInt(datoExtra));
         }
 
-        System.out.println("FACADE: Pedido #" + id + " creado con Factory Method Clásico.");
+        System.out.println("FACADE: Pedido #" + id + " creado. Tipo: " + tipo);
         return nuevoPedido;
     }
 
@@ -236,11 +234,12 @@ public class RestauranteFacade {
     public void pagarPedido(int idPedido, String nit, String razonSocial) {
         Pedido p = buscarPedido(idPedido);
         if (p != null) {
+            p.validarFacturacion();
+            
             p.setNitFactura(nit);
             p.setRazonSocialFactura(razonSocial);
             p.setFechaFactura(java.time.LocalDate.now().toString());
     
-            // NUEVO: Calcular y guardar el detalle del total
             Map<String, Object> detalle = calcularDetalleTotal(idPedido);
             if (detalle != null) {
                 p.setSubtotalFactura((Double) detalle.get("subtotal"));

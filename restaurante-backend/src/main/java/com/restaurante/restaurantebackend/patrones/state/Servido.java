@@ -10,6 +10,11 @@ public class Servido extends BaseEstadoPedido {
     }
 
     @Override
+    public boolean puedeFacturar() {
+        return true;
+    }
+
+    @Override
     public String getNombre() {
         return "Servido";
     }

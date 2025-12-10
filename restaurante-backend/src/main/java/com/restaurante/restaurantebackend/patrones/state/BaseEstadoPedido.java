@@ -18,4 +18,9 @@ public abstract class BaseEstadoPedido implements EstadoPedido {
     public void cancelar(Pedido pedido) {
         throw new TransicionInvalidaException("No se puede CANCELAR desde el estado: " + getNombre());
     }
+
+    @Override
+    public boolean puedeFacturar() {
+        return false;
+    }
 }

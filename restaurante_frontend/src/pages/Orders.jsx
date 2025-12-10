@@ -36,6 +36,13 @@ const Orders = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Función auxiliar para obtener estilos e íconos según el tipo
+  const getEstiloPedido = (tipo) => {
+    if (tipo === 'EN_MESA') return { icon: '🍽️', bg: 'bg-orange-50 text-orange-600' };
+    if (tipo === 'PARA_LLEVAR') return { icon: '🛍️', bg: 'bg-purple-50 text-purple-600' };
+    return { icon: '🛵', bg: 'bg-blue-50 text-blue-600' }; // Default Delivery
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-50 font-sans">
       <Sidebar />
@@ -62,34 +69,40 @@ const Orders = () => {
                         <p className="font-medium">No hay pedidos pendientes</p>
                     </div>
                 ) : (
-                    pedidosActivos.map(p => (
-                        <div key={p.id} className="bg-white border border-gray-100 p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow flex justify-between items-center animate-fade-in">
-                            <div className="flex items-center gap-4">
-                                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold ${
-                                    p.tipo === 'DELIVERY' ? 'bg-blue-50 text-blue-600' : 'bg-orange-50 text-orange-600'
-                                }`}>
-                                    {p.tipo === 'DELIVERY' ? '🛵' : '🍽️'}
-                                </div>
-                                <div>
-                                    <h4 className="font-bold text-gray-800 text-lg">#{p.id} - {p.nombreCliente}</h4>
-                                    <div className="text-sm text-gray-500 flex gap-3">
-                                        <span>{p.tipo === 'EN_MESA' ? `Mesa ${p.idMesa}` : p.direccion}</span>
-                                        <span>•</span>
-                                        <span>{p.items ? p.items.length : 0} items</span>
+                    pedidosActivos.map(p => {
+                        const estilo = getEstiloPedido(p.tipo);
+                        return (
+                            <div key={p.id} className="bg-white border border-gray-100 p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow flex justify-between items-center animate-fade-in">
+                                <div className="flex items-center gap-4">
+                                    {/* Ícono dinámico */}
+                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold ${estilo.bg}`}>
+                                        {estilo.icon}
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-gray-800 text-lg">#{p.id} - {p.nombreCliente}</h4>
+                                        <div className="text-sm text-gray-500 flex gap-3">
+                                            <span>
+                                                {p.tipo === 'EN_MESA' ? `Mesa ${p.idMesa}` : 
+                                                 p.tipo === 'PARA_LLEVAR' ? 'Recoger en Local' : 
+                                                 p.direccion}
+                                            </span>
+                                            <span>•</span>
+                                            <span>{p.items ? p.items.length : 0} items</span>
+                                        </div>
                                     </div>
                                 </div>
+                                <div className="text-right">
+                                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
+                                        p.estadoNombre === 'En Cola' ? 'bg-gray-100 text-gray-600' :
+                                        p.estadoNombre === 'En Preparación' ? 'bg-yellow-100 text-yellow-700' :
+                                        'bg-green-100 text-green-700'
+                                    }`}>
+                                        {p.estadoNombre}
+                                    </span>
+                                </div>
                             </div>
-                            <div className="text-right">
-                                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
-                                    p.estadoNombre === 'En Cola' ? 'bg-gray-100 text-gray-600' :
-                                    p.estadoNombre === 'En Preparación' ? 'bg-yellow-100 text-yellow-700' :
-                                    'bg-green-100 text-green-700'
-                                }`}>
-                                    {p.estadoNombre}
-                                </span>
-                            </div>
-                        </div>
-                    ))
+                        );
+                    })
                 )}
             </div>
           </div>
@@ -154,7 +167,8 @@ const NewOrderModal = ({ onClose }) => {
             tipoBackend = "DELIVERY";
             datoExtra = direccion;
         } else if (tipo === "PARA_LLEVAR") {
-            tipoBackend = "DELIVERY";
+            // --- CORRECCIÓN IMPORTANTE AQUÍ ---
+            tipoBackend = "PARA_LLEVAR"; // Antes decía "DELIVERY" y sobreescribía el tipo
             datoExtra = "Recoger en Local"; 
         }
 
@@ -195,7 +209,7 @@ const NewOrderModal = ({ onClose }) => {
                                 </select>
                             </div>
 
-                            {}
+                            {/* Campos Dinámicos */}
                             <div>
                                 {tipo === "EN_MESA" && (
                                     <>
