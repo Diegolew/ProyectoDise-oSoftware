@@ -5,7 +5,12 @@ const RestaurantContext = createContext();
 export const RestaurantProvider = ({ children }) => {
   const [mesas, setMesas] = useState([]);
   const [menu, setMenu] = useState([]);
-  const [pedidosCocina, setPedidosCocina] = useState([]);
+  
+  // --- PASO 1: AGREGAMOS EL ESTADO DEL ROL ---
+  // Por defecto iniciamos como 'Admin' para ver todo, 
+  // pero esto cambiará con el switch.
+  const [rol, setRol] = useState("Admin"); 
+  
   const [loading, setLoading] = useState(true);
 
   const refreshMesas = async () => {
@@ -33,7 +38,15 @@ export const RestaurantProvider = ({ children }) => {
   }, []);
 
   return (
-    <RestaurantContext.Provider value={{ mesas, menu, refreshMesas, refreshMenu, loading }}>
+    <RestaurantContext.Provider value={{ 
+        mesas, 
+        menu, 
+        refreshMesas, 
+        refreshMenu, 
+        loading,
+        rol,     
+        setRol   
+    }}>
       {children}
     </RestaurantContext.Provider>
   );

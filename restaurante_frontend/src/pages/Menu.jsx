@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
+import TopBar from "../components/TopBar";
+import { useRestaurant } from "../context/RestaurantContext"; 
 
 const Menu = () => {
+  const { rol } = useRestaurant();
   const [items, setItems] = useState([]);
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
   const [modalAbierto, setModalAbierto] = useState(false);
-  const [itemEditando, setItemEditando] = useState(null); // Si es null, es modo CREAR
+  const [itemEditando, setItemEditando] = useState(null); 
 
   const [formData, setFormData] = useState({
     nombre: "",
@@ -80,24 +83,19 @@ const Menu = () => {
       <Sidebar />
       <div className="ml-64 flex-1 p-8">
         
-        {}
-        <header className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800 font-serif">Menú</h1>
-            <p className="text-gray-500 mt-1">Gestiona los platos y bebidas</p>
-          </div>
-          
-          <div className="flex gap-4">
-            <button 
-              onClick={() => abrirModal()}
-              className="bg-vino-900 text-white px-6 py-2 rounded-lg font-bold shadow-md hover:bg-vino-800 transition-transform active:scale-95 flex items-center gap-2"
-            >
-              <span>+</span> Nuevo Plato
-            </button>
-          </div>
-        </header>
+        <TopBar title="Menú" subtitle="Gestiona los platos y bebidas" />
+        
+        {rol !== 'Cliente' && (
+            <div className="flex justify-end mb-4">
+                <button 
+                onClick={() => abrirModal()}
+                className="bg-vino-900 text-white px-6 py-2 rounded-lg font-bold shadow-md hover:bg-vino-800 transition-transform active:scale-95 flex items-center gap-2"
+                >
+                <span>+</span> Nuevo Plato
+                </button>
+            </div>
+        )}
 
-        {}
         <div className="flex gap-2 mb-8 border-b border-gray-200 pb-1 overflow-x-auto">
           {categorias.map(cat => (
             <button
@@ -114,7 +112,6 @@ const Menu = () => {
           ))}
         </div>
 
-        {}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {itemsVisibles.map((item) => (
             <div key={item.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative group">
@@ -127,12 +124,15 @@ const Menu = () => {
                 }`}>
                   {item.categoria}
                 </span>
-                <button 
-                  onClick={() => abrirModal(item)}
-                  className="text-gray-400 hover:text-vino-800 text-sm font-medium border border-gray-200 px-3 py-1 rounded hover:bg-gray-50 transition-colors"
-                >
-                  Editar
-                </button>
+                
+                {rol !== 'Cliente' && (
+                    <button 
+                    onClick={() => abrirModal(item)}
+                    className="text-gray-400 hover:text-vino-800 text-sm font-medium border border-gray-200 px-3 py-1 rounded hover:bg-gray-50 transition-colors"
+                    >
+                    Editar
+                    </button>
+                )}
               </div>
 
               <h3 className="font-serif font-bold text-xl text-gray-800 mb-2">{item.nombre}</h3>
@@ -156,8 +156,7 @@ const Menu = () => {
           ))}
         </div>
 
-        {}
-        {modalAbierto && (
+        {modalAbierto && rol !== 'Cliente' && (
           <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center backdrop-blur-sm">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-8 relative animate-scale-in">
               <button onClick={() => setModalAbierto(false)} className="absolute top-5 right-5 text-gray-400 hover:text-gray-800 text-xl">✕</button>

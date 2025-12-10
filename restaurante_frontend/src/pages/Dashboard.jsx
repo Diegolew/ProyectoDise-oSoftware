@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import { Link } from "react-router-dom"; 
+import { useRestaurant } from "../context/RestaurantContext";
+import TopBar from "../components/TopBar";
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -15,22 +17,17 @@ const Dashboard = () => {
 
   const cargarDatos = async () => {
     try {
-      // Pedidos activos (para contar)
       const resPedidos = await fetch("http://localhost:8080/api/pedidos");
       const pedidos = await resPedidos.json();
 
-      // Mesas
       const resMesas = await fetch("http://localhost:8080/api/mesas");
       const dataMesas = await resMesas.json();
       setMesas(dataMesas);
 
-      // CAMBIO IMPORTANTE: Obtener ventas del HISTORIAL (facturas cerradas)
       const resHistorial = await fetch("http://localhost:8080/api/pedidos/historial");
       const historial = await resHistorial.json();
 
-      // Calcular ventas LÍQUIDAS (con descuentos, sin impuestos)
       const ventasLiquidas = historial.reduce((total, pedido) => {
-        // Usar el total final guardado en la factura (ya incluye descuentos)
         const totalPedido = pedido.totalFinalFactura || 0;
         return total + totalPedido;
       }, 0);
@@ -42,7 +39,7 @@ const Dashboard = () => {
       setPedidosRecientes(recientes);
 
       setStats({
-        ventasHoy: ventasLiquidas, // AHORA ES LÍQUIDO
+        ventasHoy: ventasLiquidas,
         pedidosActivos: activos,
         mesasOcupadas: ocupadas,
         reservasHoy: 0, 
@@ -65,13 +62,9 @@ const Dashboard = () => {
       <Sidebar />
       <div className="ml-64 flex-1 p-8 font-sans">
         
-        {/* Header */}
-        <header className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
-            <p className="text-gray-500 mt-1">Resumen general del restaurante</p>
-        </header>
+        {/* Usamos el componente importado */}
+        <TopBar title="Dashboard" subtitle="martes, 9 de diciembre" />
 
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard 
             title="Mesas Ocupadas" 
@@ -185,7 +178,6 @@ const Dashboard = () => {
     </div>
   );
 };
-
 
 const StatCard = ({ title, value, icon, bgIcon, subtitle }) => (
   <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow">

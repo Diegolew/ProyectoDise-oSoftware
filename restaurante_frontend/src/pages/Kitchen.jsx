@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
+import TopBar from "../components/TopBar";
 
 const Kitchen = () => {
   const [pedidos, setPedidos] = useState([]);
@@ -64,10 +65,9 @@ const Kitchen = () => {
       <Sidebar />
       <div className="flex-1 ml-64 p-8 overflow-hidden h-screen flex flex-col">
         
-        <header className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 font-serif">Cocina</h1>
-            <p className="text-gray-500 mt-1">Vista de pedidos para preparación</p>
-        </header>
+        {/* --- 2. USAMOS EL NUEVO COMPONENTE TOPBAR --- */}
+        {/* Esto agrega el título y el selector de roles a la derecha */}
+        <TopBar title="Cocina" subtitle="Vista de pedidos para preparación" />
 
         <div className="grid grid-cols-3 gap-6 flex-1 overflow-hidden">
           
@@ -110,9 +110,9 @@ const Kitchen = () => {
 
           <ColumnKanban 
             title="Listo para Servir" 
-            icon="✅"
+            icon="✅" 
             count={listos.length} 
-            headerColor="text-green-600"
+            headerColor="text-green-600" 
             bgBadge="bg-green-100 text-green-600"
           >
             {listos.map(p => (
