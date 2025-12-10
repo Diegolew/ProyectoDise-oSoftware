@@ -215,8 +215,8 @@ const ModalFactura = ({ factura, infoRestaurante, onClose }) => {
 
     return (
         <div className="fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4 backdrop-blur-md">
-            <div className="bg-white w-full max-w-2xl shadow-2xl relative animate-scale-in overflow-hidden">
-                
+            <div className="bg-white w-full max-w-2xl max-h-[90vh] shadow-2xl relative animate-scale-in overflow-y-auto">
+                     
                 {/* Header */}
                 <div className="bg-white p-8 pb-4">
                     <div className="flex justify-between items-start">

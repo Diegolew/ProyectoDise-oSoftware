@@ -10,7 +10,7 @@ import Kitchen from "./pages/Kitchen";
 import Orders from "./pages/Orders";
 import Delivery from "./pages/Delivery";
 import Billing from "./pages/Billing";
-import Promotions from "./pages/Promotions"; // <--- IMPORTANTE: Importar el archivo real
+import Promotions from "./pages/Promotions";
 import Settings from "./pages/Settings";
 const Placeholder = ({ title }) => (
   <div className="flex min-h-screen bg-gray-100">
